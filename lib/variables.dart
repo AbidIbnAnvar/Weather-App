@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 enum ActiveButton { today, tomorrow, yesterday, next7days, past7days }
 
@@ -21,8 +22,7 @@ Map<ActiveButton, String> buttonTitle = {
 };
 
 //loading_page
-String _apiKey = '7e777be9b00b0067f0d612a03489f6ca';
 
 String getApiKey() {
-  return _apiKey;
+  return dotenv.env['OWM_API_KEY'] ?? '';
 }

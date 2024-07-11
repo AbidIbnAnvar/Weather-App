@@ -7,6 +7,7 @@ class Location {
 
   Future<void> getCurrentLocation() async {
     try {
+      print('getCurrentLocation start');
       LocationPermission permission = await Geolocator.requestPermission();
 
       if (permission == LocationPermission.whileInUse ||
@@ -20,6 +21,7 @@ class Location {
       } else {
         print('Access to location is denied.');
       }
+      print('getCurrentLocation end');
     } catch (e) {
       print('Error in Location');
     }

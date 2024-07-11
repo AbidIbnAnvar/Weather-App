@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 const climateData = {
   0: 'Clear',
@@ -67,8 +68,6 @@ const defaultForegroundColor = Color(0xFFAFB0B2);
 
 const dayTimeColor1 = Color(0xB90080FF);
 const dayTimeColor2 = Color(0xB941A1F7);
-// const dayTimeColor1 = Color(0xFF82A9F7);
-// const dayTimeColor2 = Color(0xCC0080FF);
 
 const nightTimeColor1 = Color(0xFF00060c);
 const nightTimeColor2 = Color(0x39000080);
@@ -78,7 +77,6 @@ const dayWidgetColor = Color(0x59000035);
 
 const TextStyle kSmallDarkTextStyle = TextStyle(
   fontSize: 16,
-  // color: Color(0xFF848484),
   color: Color(0xFFcecece),
   letterSpacing: 0.75,
   fontFamily: 'RB',

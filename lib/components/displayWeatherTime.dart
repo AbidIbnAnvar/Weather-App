@@ -127,7 +127,7 @@ List<Container> displayWeatherTime(String currentTitle, ActiveButton active,
           Visibility(
             visible: (i == endIndex) ? false : true,
             child: Divider(
-              height: 030,
+              height: 30,
               thickness: 0.2,
               color: Colors.white,
               indent: 8,

@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:weather_app/constants.dart';
 import 'package:weather_app/services/gemini.dart';
 
 import '../variables.dart' as variables;
@@ -24,16 +26,15 @@ class _LoadingPageState extends State<LoadingPage> {
 
   void getLocationData() async {
     try {
-      print('Reached get Location Data');
       Location location = Location();
       await location.getCurrentLocation();
+      String owmApiKey = dotenv.env['OWM_API_KEY']!;
       NetworkCityHelper networkCityHelper = NetworkCityHelper(
         latitude: location.latitude,
         longitude: location.longitude,
-        apiKey: variables.getApiKey(),
+        apiKey: owmApiKey,
       );
       var cityData = await networkCityHelper.getData();
-
       NetworkWeatherHelper networkWeatherHelper = NetworkWeatherHelper(
         latitude: location.latitude,
         longitude: location.longitude,
@@ -46,9 +47,6 @@ class _LoadingPageState extends State<LoadingPage> {
           temp = weatherData['current']['temperature_2m'];
           _offset = weatherData['utc_offset_seconds'] / 3600;
         });
-        print('City: $_city');
-        print('Temperature: $temp');
-        print('Offset: $_offset');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -60,12 +58,9 @@ class _LoadingPageState extends State<LoadingPage> {
                 offset: _offset!),
           ),
         );
-      } else {
-        print('Failed to load weather data');
       }
     } catch (e) {
       _showErrorDialog(context, 'Check your internet connection and try again');
-      print('Error occurred: $e');
     }
   }
 

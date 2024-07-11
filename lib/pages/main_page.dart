@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:weather_app/constants.dart';
@@ -45,6 +46,8 @@ class _MainPageState extends State<MainPage> {
   late bool isDay;
   bool refreshing = false;
   Gemini gemini = Gemini();
+  List lifestyleTips = [];
+  bool tipsLoaded = false;
 
   // late bool isDay;
   String todayDate() {
@@ -212,12 +215,55 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
+  void getLifestyleTips() async {
+    try {
+      Map geminiData = await gemini.generateResponse(
+          'Give me 5 lifestyle for the weather ${temp.round()}º ${activeUnit == ActiveUnit.celsius ? 'Celsius' : 'Fahrenheit'} (give single line points)(return in json/key-value format)(key=\'tips\')(value type=list of string)');
+      setState(() {
+        lifestyleTips = geminiData['tips'];
+        tipsLoaded = true;
+      });
+      print(lifestyleTips);
+    } catch (e) {
+      print('Error while generating lifestyle tips. $e');
+    }
+  }
+
+  List<Column> displayLifestyleTips() {
+    List<Column> tips = [];
+    int n = lifestyleTips.length;
+    for (int i = 0; i < n; i++) {
+      tips.add(Column(
+        children: [
+          Text(
+            lifestyleTips[i],
+            style: isDay
+                ? kSmallLightTextStyle.copyWith(fontSize: 14)
+                : kSmallDarkTextStyle.copyWith(fontSize: 14),
+          ),
+          Visibility(
+            visible: (i == n - 1) ? false : true,
+            child: Divider(
+              height: 30,
+              thickness: 0.2,
+              color: Colors.white,
+              indent: 8,
+              endIndent: 8,
+            ),
+          ),
+        ],
+      ));
+    }
+    return tips;
+  }
+
   @override
   void initState() {
     super.initState();
     weatherDataMap = widget.weatherData;
     cityDataMap = widget.cityData;
     updateUI();
+    getLifestyleTips();
   }
 
   @override
@@ -503,6 +549,68 @@ class _MainPageState extends State<MainPage> {
                         ),
                       ),
                       Container(
+                        margin: EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: (isDay) ? dayWidgetColor : nightWidgetColor,
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Lifestyle Tips',
+                                  style: (isDay)
+                                      ? kSmallLightTextStyle.copyWith(
+                                          fontFamily: 'RB Bold')
+                                      : kSmallDarkTextStyle.copyWith(
+                                          fontFamily: 'RB Bold'),
+                                ),
+                                (tipsLoaded == false)
+                                    ? SpinKitCircle(
+                                        size: 30,
+                                        color: Colors.white,
+                                      )
+                                    : SizedBox(
+                                        width: 30,
+                                      ),
+                                // ListView.builder(
+                                //         itemCount: lifestyleTips.length,
+                                //         itemBuilder: (context, index) {
+                                //           final tipText = lifestyleTips[index];
+                                //           return Column(
+                                //             children: [
+                                //               Container(
+                                //                 child: Text(tipText),
+                                //               )
+                                //             ],
+                                //           );
+                                //         }),
+                              ],
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: (tipsLoaded == false)
+                                  ? Text(
+                                      'Generating Lifestyle Tips...',
+                                      style: (isDay)
+                                          ? kSmallLightTextStyle.copyWith(
+                                              fontSize: 12)
+                                          : kSmallDarkTextStyle.copyWith(
+                                              fontSize: 12),
+                                    )
+                                  : Column(
+                                      children: displayLifestyleTips(),
+                                    ),
+                            )
+                          ],
+                        ),
+                      ),
+                      Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(40),
                           color: Color(0x00202329),
@@ -516,65 +624,10 @@ class _MainPageState extends State<MainPage> {
                               button: ActiveButton.today,
                               weatherDataMap: weatherDataMap,
                               offset: widget.offset,
-                              // onTap: () {
-                              //   setState(() {
-                              //     active = ActiveButton.today;
-                              //   });
-                              // },
                             ),
-                            // WeatherTimeButtons(
-                            //   isDay: isDay,
-                            //   button: ActiveButton.tomorrow,
-                            //   onTap: () {
-                            //     setState(() {
-                            //       active = ActiveButton.tomorrow;
-                            //     });
-                            //   },
-                            // ),
-                            // WeatherTimeButtons(
-                            //   button: ActiveButton.yesterday,
-                            //   onTap: () {
-                            //     setState(() {
-                            //       active = ActiveButton.yesterday;
-                            //     });
-                            //   },
-                            // ),
-                            // WeatherTimeButtons(
-                            //   button: ActiveButton.next7days,
-                            //   onTap: () {
-                            //     setState(() {
-                            //       active = ActiveButton.next7days;
-                            //     });
-                            //   },
-                            // ),
-                            // WeatherTimeButtons(
-                            //   button: ActiveButton.past7days,
-                            //   isLast: true,
-                            //   onTap: () {
-                            //     setState(() {
-                            //       active = ActiveButton.past7days;
-                            //     });
-                            //   },
-                            // ),
                           ],
                         ),
                       ),
-                      // SingleChildScrollView(
-                      //   scrollDirection: Axis.vertical,
-                      //   child: Container(
-                      //     padding: EdgeInsets.symmetric(
-                      //         horizontal: 30, vertical: 20),
-                      //     decoration: BoxDecoration(
-                      //       borderRadius: BorderRadius.circular(20),
-                      //       color: (isDay) ? dayWidgetColor : nightWidgetColor,
-                      //     ),
-                      //     child: Column(
-                      //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //       children: displayWeatherTime(
-                      //           active, weatherDataMap, isDay),
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
